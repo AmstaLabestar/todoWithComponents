@@ -1,0 +1,190 @@
+/* App.css */
+
+/* Styles globaux */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  color: #212529;
+  margin: 0;
+  padding: 0;
+}
+
+/* Conteneur principal */
+.app.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Mode sombre */
+.app.dark {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+.app.dark input,
+.app.dark .form-control,
+.app.dark .list-group-item {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  border: 1px solid #444;
+}
+
+/* Titres */
+h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Formulaire */
+form.d-flex {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.form-control {
+  flex: 1 1 150px;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #80bdff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0,123,255,.5);
+}
+
+/* Boutons */
+.btn {
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-success {
+  background-color: #198754;
+  border-color: #198754;
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #157347;
+  border-color: #146c43;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
+}
+
+.btn-outline-primary,
+.btn-outline-warning,
+.btn-outline-success {
+  background-color: transparent;
+  border: 1px solid currentColor;
+  color: inherit;
+  padding: 0.375rem 0.75rem;
+  margin-right: 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.btn-outline-primary:hover {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.btn-outline-warning:hover {
+  background-color: #ffc107;
+  color: black;
+}
+
+.btn-outline-success:hover {
+  background-color: #198754;
+  color: white;
+}
+
+/* Groupe de boutons (filtres, actions sur tâche) */
+.btn-group {
+  display: flex;
+}
+
+.btn-group > button {
+  margin-right: 0.25rem;
+}
+
+/* Liste des tâches */
+.list-group {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.list-group-item {
+  background-color: white;
+  border: 1px solid #ced4da;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 0.25rem;
+  transition: background-color 0.3s ease;
+  cursor: default;
+}
+
+.list-group-item-success {
+  background-color: #d1e7dd;
+  border-color: #badbcc;
+  color: #0f5132;
+}
+
+/* Texte de la tâche */
+.list-group-item strong {
+  font-size: 1.1rem;
+}
+
+.list-group-item small.text-muted {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+/* Zone cliquable pour éditer */
+.list-group-item > div.flex-grow-1 {
+  flex-grow: 1;
+  cursor: pointer;
+}
+
+/* Input lors de l'édition */
+.list-group-item input.form-control {
+  font-size: 1rem;
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  form.d-flex {
+    flex-direction: column;
+  }
+
+  .form-control {
+    flex: 1 1 100%;
+  }
+
+  .btn-group {
+    flex-wrap: wrap;
+  }
+
+  .btn-group > button {
+    margin-bottom: 0.25rem;
+  }
+}
