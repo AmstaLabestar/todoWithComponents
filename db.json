@@ -1,0 +1,25 @@
+{
+  "todos": [
+    {
+      "id": "b0c7",
+      "text": "Jouer au foot",
+      "date": "2025-06-11",
+      "completed": false,
+      "isEditing": false
+    },
+    {
+      "id": "47b6",
+      "text": "Allez au Cine",
+      "date": "2025-06-05",
+      "completed": false,
+      "isEditing": false
+    },
+    {
+      "id": "e6df",
+      "text": "coder mon app",
+      "date": "2025-06-04",
+      "completed": false,
+      "isEditing": false
+    }
+  ]
+}
