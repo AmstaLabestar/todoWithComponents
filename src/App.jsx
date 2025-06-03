@@ -15,6 +15,11 @@ export default function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if(todo.trim()=='') {
+      alert('Saisissez une tache') 
+    return
+    }
+      
     if (!todo) return;
     const newTodo = {
       text: todo,
@@ -66,7 +71,7 @@ export default function App() {
 
   return (
     <div className={`app container mt-5 ${darkMode ? 'dark' : ''}`}>
-      <h2>Ma Todo List</h2>
+      <h2>Toom segglego</h2>
       
 
       <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
