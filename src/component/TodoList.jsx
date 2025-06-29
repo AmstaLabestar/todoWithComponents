@@ -1,6 +1,7 @@
 import React from 'react';
 import TodoItem from './TodoItem';
 
+// Composant qui affiche la liste des tâches, ou un message si la liste est vide
 export default function TodoList({
   todos,
   toggleComplete,
@@ -11,12 +12,13 @@ export default function TodoList({
   return (
     <ul className="list-group mt-4 tolist">
       {todos.length === 0 ? (
-        <li className="list-group-item d-flex justify-content-between align-items-center text-center">Aucune tâche</li>
+        // Message si aucune tâche
+        <li className="list-group-item text-center">Aucune tâche</li>
       ) : (
-        todos.map((todo, index) => (
+        // Sinon, on affiche chaque tâche via TodoItem
+        todos.map((todo) => (
           <TodoItem
-            key={index}
-            index={index}
+            key={todo.id} // clé unique pour React
             todo={todo}
             toggleComplete={toggleComplete}
             deleteTodo={deleteTodo}

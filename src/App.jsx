@@ -1,5 +1,4 @@
-// App.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -8,159 +7,138 @@ import TodoForm from './component/TodoForm';
 import TodoFilters from './component/TodoFilters';
 import DarkModeToggle from './component/DarkModeToggle';
 import TodoList from './component/TodoList';
+import { initialState, todoReducer } from './component/FunctionReducer';
+
+
 
 export default function App() {
-  const [todo, setTodo] = useState('');
-  const [todoDate, setTodoDate] = useState('');
-  const [todoList, setTodoList] = useState([]);
-  const [filter, setFilter] = useState('all');
-  const [darkMode, setDarkMode] = useState(false);
+  const [state, dispatch] = useReducer(todoReducer, initialState);
+  const { todo, todoDate, todoList, filter, darkMode } = state;
 
 
-//   useEffect(() => {
-//   const savedTodos = localStorage.getItem('todoList');
-//   if (savedTodos) {
-//     setTodoList(JSON.parse(savedTodos));
-//   }
-// }, []);
+  console.log('render')
 
-// useEffect(() => {
-//   localStorage.setItem('todoList', JSON.stringify(todoList));
-// }, [todoList]);
-useEffect(() => {
-  fetch('http://localhost:3001/todos')
-    .then(res => res.json())
-    .then(data => setTodoList(data))
-    .catch(err => console.error('Erreur chargement tâches', err));
+
+  // Crée des fonctions qu’on va donner aux composants, mémorisées pour éviter de recréer à chaque rendu
+  const setTodo = useCallback((val) => {
+  dispatch({ type: 'SET_TODO', payload: val });
+}, []);
+
+const setTodoDate = useCallback((val) => {
+  dispatch({ type: 'SET_TODO_DATE', payload: val });
 }, []);
 
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if(todo.trim()=='') {
-      toast.error('Veuillez saisir une tâche.');
+// au chargement, on récupère le localStorage.
+  useEffect(() => {
+    const savedTodos = JSON.parse(localStorage.getItem('todoList'));
+    const savedDarkMode = JSON.parse(localStorage.getItem('darkMode'));
 
-    return
-    }
-      
-    if (!todo) return;
-    const newTodo = {
-      text: todo,
-      date: todoDate,
-      completed: false,
-      isEditing: false
-    };
-    // setTodoList([...todoList, newTodo]);
-    // setTodo('');
-    // setTodoDate('');
+    dispatch({
+      type: 'LOAD_SAVED_STATE',
+      payload: {
+        todoList: savedTodos || [],
+        darkMode: savedDarkMode ?? false,
+      },
+    });
+  }, []);
 
-  fetch('http://localhost:3001/todos', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(newTodo)
-})
-.then(res => res.json())
-.then(data => {
-  setTodoList([...todoList, data]);
-  toast.success('Tâche ajoutée !');
 
-  setTodo('');
-  setTodoDate('');
-});
-  };
+  
+    // À chaque changement de todoList, sauvegarde-la dans localStorage
+  useEffect(() => {
+    localStorage.setItem('todoList', JSON.stringify(todoList));
+  }, [todoList]);
 
-  const toggleComplete = (index) => {
-    // const updated = [...todoList];
-    // updated[index].completed = !updated[index].completed;
-    // setTodoList(updated);
+  // À chaque changement de darkMode, sauvegarde-le dans localStorage
+  useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+  }, [darkMode]);
 
-    const todo = todoList[index];
-const updatedTodo = { ...todo, completed: !todo.completed };
+    // Gestion de la soumission du formulaire pour ajouter une tâche
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault(); // Empêche le rechargement de la page
+      if (todo.trim() === '') {
+        toast.error('Veuillez saisir une tâche.');
+        return;
+      }
+      dispatch({ type: 'ADD_TODO' });
+      toast.success('Tâche ajoutée !');
+    },
+    [todo] // Dépend de la valeur actuelle du champ texte
+  );
 
-fetch(`http://localhost:3001/todos/${todo.id}`, {
-  method: 'PATCH',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ completed: updatedTodo.completed })
-})
-.then(res => res.json())
-.then(() => {
-  const updatedList = [...todoList];
-  updatedList[index] = updatedTodo;
-  setTodoList(updatedList);
-  toast.success(todo.completed ? 'Tâche marquée comme à faire.' : 'Tâche marquée comme faite.');
 
-});
+    // Supprime une tâche par son id
+  const deleteTodo = useCallback((id) => {
+    dispatch({ type: 'DELETE_TODO', payload: id });
+    toast.info('Tâche supprimée.');
+  }, []);
 
-  };
+  // Change le statut (fait / pas fait) d'une tâche
+  const toggleComplete = useCallback((id) => {
+    dispatch({ type: 'TOGGLE_TODO', payload: id });
+    toast.success('Statut changé.');
+  }, []);
 
-  const deleteTodo = (index) => {
-    // const updated = [...todoList];
-    // updated.splice(index, 1);
-    // setTodoList(updated);
-    const id = todoList[index].id;
+  // Met une tâche en mode édition
+  const startEditing = useCallback((id) => {
+    dispatch({ type: 'START_EDITING', payload: id });
+  }, []);
 
-fetch(`http://localhost:3001/todos/${id}`, {
-  method: 'DELETE'
-})
-.then(() => {
-  const updated = todoList.filter(todo => todo.id !== id);
-  setTodoList(updated);
-  toast.info('Tâche supprimée.');
+  // Sauvegarde le texte modifié d'une tâche
+  const saveEditedTodo = useCallback((id, newText) => {
+    dispatch({ type: 'SAVE_EDITED_TODO', payload: { id, newText } });
+    toast.success('Tâche modifiée.');
+  }, []);
 
-});
-
-  };
-
-  const startEditing = (index) => {
-    const updated = [...todoList];
-    updated[index].isEditing = true;
-    setTodoList(updated);
-  };
-
-  const saveEditedTodo = (index, newText) => {
-    // const updated = [...todoList];
-    // updated[index].text = newText;
-    // updated[index].isEditing = false;
-    // setTodoList(updated);
-    const todo = todoList[index];
-const updatedTodo = { ...todo, text: newText, isEditing: false };
-
-fetch(`http://localhost:3001/todos/${todo.id}`, {
-  method: 'PATCH',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ text: newText, isEditing: false })
-})
-.then(res => res.json())
-.then(() => {
-  const updatedList = [...todoList];
-  updatedList[index] = updatedTodo;
-  setTodoList(updatedList);
-  toast.success('Tâche modifiée.');
-
-});
-
-  };
-
-  const handleEditKey = (e, index) => {
+  
+    // Quand on appuie sur Entrée pendant l'édition, sauvegarde la tâche
+  const handleEditKey = useCallback((e, id) => {
     if (e.key === 'Enter') {
-      saveEditedTodo(index, e.target.value);
+      saveEditedTodo(id, e.target.value);
     }
-  };
+  }, [saveEditedTodo]);
 
-  const filteredTodos = todoList.filter((todo) => {
-    if (filter === 'all') return true;
-    if (filter === 'done') return todo.completed;
-    if (filter === 'todo') return !todo.completed;
-  });
+  // Change le filtre actif (toutes, à faire, faites)
+  const setFilter = useCallback((value) => {
+    dispatch({ type: 'SET_FILTER', payload: value });
+  }, []);
 
-  return (
+  // Active / désactive le mode sombre
+  const setDarkMode = useCallback((value) => {
+    dispatch({ type: 'SET_DARK_MODE', payload: value });
+  }, []);
+
+
+    const filteredTodos = useMemo(() => {
+    if (filter === 'all') return todoList;
+    if (filter === 'done') return todoList.filter((todo) => todo.completed);
+    if (filter === 'todo') return todoList.filter((todo) => !todo.completed);
+    return todoList;
+  }, [filter, todoList]); // Recalcule seulement si le filtre ou la liste changent
+
+    return (
     <div className={`app container mt-5 ${darkMode ? 'dark' : ''}`}>
       <h2>Toom segglego</h2>
-      
 
+      {/* Bouton pour changer de mode clair / sombre */}
       <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
-      <TodoForm {...{ todo, setTodo, todoDate, setTodoDate, handleSubmit }} />
+
+      {/* Formulaire pour ajouter une nouvelle tâche */}
+      <TodoForm
+        todo={todo}
+        setTodo={setTodo}              
+        todoDate={todoDate}
+        setTodoDate={setTodoDate}      
+        handleSubmit={handleSubmit}
+      />
+
+      {/* Filtres pour afficher toutes, à faire ou faites */}
       <TodoFilters filter={filter} setFilter={setFilter} />
+
+      {/* Liste des tâches filtrées */}
       <TodoList
         todos={filteredTodos}
         toggleComplete={toggleComplete}
@@ -168,8 +146,9 @@ fetch(`http://localhost:3001/todos/${todo.id}`, {
         startEditing={startEditing}
         handleEditKey={handleEditKey}
       />
-      <ToastContainer position="top-right" autoClose={3000} />
 
+      {/* Container des notifications toastify */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

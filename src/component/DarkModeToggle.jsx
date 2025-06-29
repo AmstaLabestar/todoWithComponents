@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 /**
- * Composant pour basculer entre mode clair et sombre.
+ * Bouton pour activer/désactiver le mode sombre.
+ * Change de texte et de style selon l'état darkMode.
  */
-export default function DarkModeToggle({ darkMode, setDarkMode }) {
+function DarkModeToggle({ darkMode, setDarkMode }) {
+  console.log('Dark'); // Vérifier les rerenders
+
   return (
     <div className="d-flex justify-content-start my-2">
-      {/* Bouton toggle  */}
       <button
-        className={`btn btn-sm  btn-border ${darkMode ? 'btn-light' : 'btn-dark'} rounded-pill shadow px-4 py-2 mb-2`}
+        className={`btn btn-sm btn-border ${darkMode ? 'btn-light' : 'btn-dark'} rounded-pill shadow px-4 py-2 mb-2`}
         onClick={() => setDarkMode(!darkMode)}
         aria-label="Toggle dark mode"
       >
@@ -17,3 +19,6 @@ export default function DarkModeToggle({ darkMode, setDarkMode }) {
     </div>
   );
 }
+
+// memo() évite de re-render sauf si darkMode change
+export default memo(DarkModeToggle);
